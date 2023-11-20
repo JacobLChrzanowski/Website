@@ -1,0 +1,5 @@
+
+
+docker container rm $(docker container ls -a | grep docker_flaskapp_prod | awk '{print $1}')
+docker image rm docker_flaskapp_prod-app
+
