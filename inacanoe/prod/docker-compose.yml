@@ -1,13 +1,15 @@
 services:
-
   web:
+    container_name: inacanoe-prod-web
     build:
       context: .
       target: builder
     ports:
-     - "5010:80"
+     - "5010:5010"
     volumes:
      - .:/project
+     - ./tmp:/tmp
+     - ./server-conf/uwsgi.ini:/etc/uwsgi/uwsgi.ini
     env_file:
       - .env
     depends_on:
@@ -16,6 +18,7 @@ services:
 
   redis:
     image: redislabs/redismod
+    container_name: inacanoe-prod-redis
     ports:
       - '6379:6379'
     volumes:
@@ -23,6 +26,7 @@ services:
 
   postgres_db:
     image: "postgres"
+    container_name: inacanoe-prod-postgres_db
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
     environment:
