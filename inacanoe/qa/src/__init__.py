@@ -7,7 +7,6 @@ _LOGGING_LEVELS = { 'debug': logging.DEBUG, 'info': logging.INFO}
 LOGGING_LEVEL = _LOGGING_LEVELS[os.environ['LOGGING_LEVEL']]
 logging.basicConfig(level=LOGGING_LEVEL, format='%(asctime)s %(levelname)s %(filename)s:%(lineno)s :: %(message)s')
 app = Flask(__name__, static_folder='../static')
-
 try:
     redis = Redis(host='redis', port=6379)
     logging.info('redis could connect')

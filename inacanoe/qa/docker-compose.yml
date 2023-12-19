@@ -1,9 +1,9 @@
 services:
-
   web:
     build:
       context: .
       target: builder
+    container_name: inacanoe-qa-web
     # flask requires SIGINT to stop gracefully
     # (default stop signal from Compose is SIGTERM)
     stop_signal: SIGINT
@@ -19,6 +19,7 @@ services:
 
   redis:
     image: redislabs/redismod
+    container_name: inacanoe-qa-redis
     ports:
       - '6379:6379'
     volumes:
@@ -26,6 +27,7 @@ services:
 
   postgres_db:
     image: "postgres"
+    container_name: inacanoe-prod-postgres_db
     ports:
       - '5432:5432'
       - '8080:8080'

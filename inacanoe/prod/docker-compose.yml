@@ -1,9 +1,9 @@
 services:
   web:
-    container_name: inacanoe-prod-web
     build:
       context: .
       target: builder
+    container_name: inacanoe-prod-web
     ports:
      - "5010:5010"
     volumes:
