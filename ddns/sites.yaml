@@ -1,0 +1,20 @@
+pushes:
+  - name: GoDaddy
+    registrar_obj: !GoDaddy
+    dotenv_varname: "_apikeygodaddy"
+    domains:
+      - domain: "ularutkowska.pl"
+        hostname: "!default"
+      - domain: "ularutkowska.com"
+        hostname: "!default"
+  - name: NameCheap
+    dotenv_varname: "namecheap_apikey"
+    domains:
+      - domain: "inacanoe.com"
+        hostname: "!default"
+        dotenv_varname: 'apikey_namecheap_inacanoe.com'
+
+hostname_bundles:
+  default:
+    - "@"
+    - "www"
