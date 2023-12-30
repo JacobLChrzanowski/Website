@@ -27,7 +27,7 @@ services:
 
   postgres_db:
     image: "postgres"
-    container_name: inacanoe-prod-postgres_db
+    container_name: inacanoe-qa-postgres
     ports:
       - '5432:5432'
       - '8080:8080'

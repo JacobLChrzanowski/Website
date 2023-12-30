@@ -1,20 +1,22 @@
 pushes:
-  - name: GoDaddy
-    registrar_obj: !GoDaddy
-    dotenv_varname: "_apikeygodaddy"
+  - !GoDaddy
+    dotenv_varname: "apikey_godaddy"
     domains:
       - domain: "ularutkowska.pl"
-        hostname: "!default"
+        bundle: "!default"
       - domain: "ularutkowska.com"
-        hostname: "!default"
-  - name: NameCheap
-    dotenv_varname: "namecheap_apikey"
+        bundle: "!default"
+  - !NameCheap
+    dotenv_varname: "apikey_namecheap_inacanoe.com"
     domains:
       - domain: "inacanoe.com"
-        hostname: "!default"
+        bundle: "!extended"
         dotenv_varname: 'apikey_namecheap_inacanoe.com'
+dotenv_vars: null
 
 hostname_bundles:
   default:
-    - "@"
-    - "www"
+    - ["A", "@", "!public_ip"]
+  extended:
+    - ["A", "@", "!public_ip"]
+    - ["A", "www", "!public_ip"]
