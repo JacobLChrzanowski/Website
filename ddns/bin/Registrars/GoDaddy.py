@@ -1,6 +1,10 @@
-#!/usr/bin/python3
-from Registrars.Default import Default_Registrar, new_dict_exclude_key
-from config import Config, Config_Obj
+#!python3
+import json
+import requests
+import logging as log
+from .Default import Default_Registrar, new_dict_exclude_key
+from Config.config import Config, Config_Obj
+from Config.derived_var_helper import get_derived_var
 
 class GoDaddy(Default_Registrar):
     """
@@ -13,21 +17,19 @@ class GoDaddy(Default_Registrar):
     url = "https://api.godaddy.com/v1/domains/{domain}/records/{record_type}/{hostname}"
     def __init__(self, dotenv_varname:  str,
                  domains:               list[dict[str, str]],
-                 dotenv_vars:           dict[str, str],
                  start_end_marks:       tuple[str, str]
                 ) -> None:
         """Config at this point is empty"""
         self.Config: Config_Obj = Config
         self.dotenv_varname = dotenv_varname
-        self.domains: dict[str, str]  = {x['domain']: new_dict_exclude_key(x, 'domain') for x in domains} #type: ignore
-        self.dotenv_vars = dotenv_vars
+        self.domains: dict[str, str] = {x['domain']: new_dict_exclude_key(x, 'domain') for x in domains} #type: ignore
         self.start_end_marks = start_end_marks
-        if self.dotenv_varname not in self.dotenv_vars.keys():
-            raise self._raise_dotenv_error()
+        if self.dotenv_varname not in Config.dotenv_vars.keys():
+            raise self._create_dotenv_KeyError()
 
     def update(self) -> tuple[str, bool]:
         for domain in self.domains.keys():
-            hostname_pairs = self.get_hostname_pair(domain)
+            hostname_pairs = self.get_dns_records_for_domain(domain)
             api_key: str = Config.dotenv_vars[self.dotenv_varname]
 
             for hostname_pair in hostname_pairs:
@@ -35,13 +37,25 @@ class GoDaddy(Default_Registrar):
 
         return ('a', False)
 
-    def craft_request(self, api_key: str, domain: str, hostname_pair:tuple[str, str]):
+    def craft_request(self, api_key: str, domain: str, hostname_pair:tuple[str, str, str]):
         url = self.url.format(domain=domain, record_type=hostname_pair[0], hostname=hostname_pair[1])
-        headers = {'content-type': 'application/json'}
-        payload = {'some': 'data'}
-        print(f"{url} {headers} {payload}")
-        # exit()
-
+        api_keyA, api_keyB = api_key.split(':')
+        headers = {'content-type': 'application/json',
+                   'Authorization': f'sso-key {api_keyA}:{api_keyB}'
+        }
+        log.debug(hostname_pair)
         
-        # r = requests.post(url, data=json.dumps(payload), headers=headers)
+        dns_entry_value = get_derived_var(hostname_pair[2])
+        # iff
+        if dns_entry_value is None:
+            raise KeyError(f"'{hostname_pair[2]}' is not present in derived values!")
+        payload = [{'data': dns_entry_value}]
+
+        if not Config.args.dryrun:
+            r = requests.put(url, data=json.dumps(payload), headers=headers)
+            log.debug(r)
+            if r.status_code == 200:
+                return True
+        else:
+            log.debug(f"{url} {headers} {payload}")
 

@@ -4,6 +4,7 @@ pushes:
     domains:
       - domain: "ularutkowska.pl"
         bundle: "!default"
+        bundle: "!extended"
       - domain: "ularutkowska.com"
         bundle: "!default"
   - !NameCheap
@@ -12,7 +13,7 @@ pushes:
       - domain: "inacanoe.com"
         bundle: "!extended"
         dotenv_varname: 'apikey_namecheap_inacanoe.com'
-dotenv_vars: null
+derived_vars: null
 
 hostname_bundles:
   default:
@@ -20,3 +21,13 @@ hostname_bundles:
   extended:
     - ["A", "@", "!public_ip"]
     - ["A", "www", "!public_ip"]
+
+
+sources:
+  - !OPNSense
+    dotenv_key: "apikey_opnsense_key"
+    dotenv_secret: "apikey_opnsense_secret"
+    host: "192.168.146.1"
+    verify_ssl: False
+    exports:
+    - "public_ip"
