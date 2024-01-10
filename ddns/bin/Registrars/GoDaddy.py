@@ -2,7 +2,7 @@
 import json
 import requests
 import logging as log
-from .Default import Default_Registrar, new_dict_exclude_key
+from .Default import Default_Registrar, DNSRecord, new_dict_exclude_key
 from Config.config import Config, Config_Obj
 from Config.derived_var_helper import get_derived_var
 
@@ -38,18 +38,18 @@ class GoDaddy(Default_Registrar):
         return ('a', False)
 
     def craft_request(self, api_key: str, domain: str, hostname_pair:tuple[str, str, str]):
+        dns_entry_value = get_derived_var(hostname_pair[2])
+        if dns_entry_value is None:
+            raise KeyError(f"'{hostname_pair[2]}' is not present in derived values!")
+        dns_record = DNSRecord(hostname_pair[0], hostname_pair[1], hostname_pair[2])
+        
         url = self.url.format(domain=domain, record_type=hostname_pair[0], hostname=hostname_pair[1])
         api_keyA, api_keyB = api_key.split(':')
         headers = {'content-type': 'application/json',
                    'Authorization': f'sso-key {api_keyA}:{api_keyB}'
         }
-        log.debug(hostname_pair)
-        
-        dns_entry_value = get_derived_var(hostname_pair[2])
-        # iff
-        if dns_entry_value is None:
-            raise KeyError(f"'{hostname_pair[2]}' is not present in derived values!")
         payload = [{'data': dns_entry_value}]
+
 
         if not Config.args.dryrun:
             r = requests.put(url, data=json.dumps(payload), headers=headers)

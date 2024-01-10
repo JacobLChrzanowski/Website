@@ -4,7 +4,6 @@ pushes:
     domains:
       - domain: "ularutkowska.pl"
         bundle: "!default"
-        bundle: "!extended"
       - domain: "ularutkowska.com"
         bundle: "!default"
   - !NameCheap

@@ -35,15 +35,30 @@ def sources_preparer(dotenv_vars: dict[str, str]):
     return sources_constructor
 
 
-def hostname_bundle_constructor(loader: yaml.SafeLoader, node: yaml.nodes.MappingNode) -> list[dict[str, DNSRecord]]:
+def transform_dns_record_data(bundles: dict[str, list[tuple[str, str, str]]]) -> dict[str, list[DNSRecord]]:
     """
+    Transform a dictionary with string keys and lists of tuples to a dictionary with string keys
+    and lists of DNSRecord objects.
+
+    Parameters:
+    - bundles (dict[str, list[tuple[str, str, str]]]): Input dictionary where keys are strings
+      and values are lists of tuples containing three strings each.
+
+    Returns:
+    - dict[str, list[DNSRecord]]: Transformed dictionary where keys are strings and values
+      are lists of DNSRecord objects.
+    ```
     """
-    values = loader.construct_mapping(node, deep=True)
-    output = []
-    print(values)
-    exit()
+    output: dict[str, list[DNSRecord]] = {}
+    for key, records in bundles.items():
+        new_records: list[DNSRecord] =  []
+        for record in records:
+            new_records.append(DNSRecord(record[0], record[1], record[2]))
+        output[key] = new_records
     return output
-    
+
+def update_hostname_bundles():
+    #TODO the !ip_address in bundles needs to be updated at some point with real data
 
 def get_loader(dotenv_vars: dict[str, str]) -> type[yaml.SafeLoader]:
     """
@@ -61,20 +76,13 @@ def get_loader(dotenv_vars: dict[str, str]) -> type[yaml.SafeLoader]:
     loader.add_constructor('!GoDaddy', registrar_preparer(dotenv_vars))
     loader.add_constructor('!NameCheap', registrar_preparer(dotenv_vars))
     loader.add_constructor('!OPNSense', sources_preparer(dotenv_vars))
-    import re
-    pattern = re.compile(r'a(\[[^\[\]]+,[^\[\]]+,[^\[\]]+\])')
-    # pattern = re.compile(r'^\d+d\d+$')
-    loader.add_implicit_resolver('!my_pattern', pattern, first=None) #type: ignore
-    # loader.add_constructor('!my_pattern', hostname_bundle_constructor)
     return loader
 
 def get_yaml_config(yaml_path: str, dotenv_vars: dict[str, str]) -> None:
     contents = yaml.load(open(yaml_path),
                          Loader=get_loader(dotenv_vars))
-    print(contents['hostname_bundles'])
-    exit()
     Config.pushes = contents['pushes']
-    Config.hostname_bundles = contents['hostname_bundles']
+    Config.hostname_bundles = transform_dns_record_data(contents['hostname_bundles'])
     Config.sources = contents['sources']
     if contents['derived_vars']:
         Config.derived_vars = contents['derived_vars']

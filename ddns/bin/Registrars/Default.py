@@ -58,12 +58,12 @@ class Default_Registrar():
     def _fmt_file_from_start_end_marks(self) -> str:
         return self.start_end_marks[0].split(',')[0].split('"')[1]
 
-    def _resolve_dns_record_tuples_from_bundlename(self, hostname: str) -> list[tuple[str, str, str]]:
+    def _get_DNSRecords_by_bundlename(self, bundlename: str) -> list[DNSRecord]:
         """
         Resolves a list of pairs of hostname/value from a bundle name.
         If you give it "!default" it will return the list under hostname_bundles > default
         """
-        bundle_name = hostname[1:]
+        bundle_name = bundlename[1:]
         if bundle_name in self.Config.hostname_bundles:
             return self.Config.hostname_bundles[bundle_name]
         else:
@@ -78,7 +78,7 @@ class Default_Registrar():
         if 'hostname' in domain_data:
             raise NotImplementedError(f"'hostname' is not yet a valid key under 'domains' key. Use bundles instead, for {domain}")
         if 'bundle' in domain_data:
-            return self._resolve_dns_record_tuples_from_bundlename(domain_data['bundle'])
+            return self._get_DNSRecords_by_bundlename(domain_data['bundle'])
 
         raise ValueError(f"Neither 'hostname' nor 'bundle' key are present under 'domains' key for domain {domain}")
 
