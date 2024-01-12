@@ -57,9 +57,6 @@ def transform_dns_record_data(bundles: dict[str, list[tuple[str, str, str]]]) ->
         output[key] = new_records
     return output
 
-def update_hostname_bundles():
-    #TODO the !ip_address in bundles needs to be updated at some point with real data
-
 def get_loader(dotenv_vars: dict[str, str]) -> type[yaml.SafeLoader]:
     """
     Gets the yaml SafeLoader,

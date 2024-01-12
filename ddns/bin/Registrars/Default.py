@@ -1,9 +1,10 @@
 #!/usr/bin/python3
-from typing import Any
 # from typing import TYPE_CHECKING
 # if TYPE_CHECKING:
 from abc import abstractmethod
+from Utils.dict_tools import new_dict_exclude_key
 from Config.config import Config_Obj
+from Config.derived_var_helper import get_derived_var
 
 class DNSRecord():
     def __init__(self, record_type: str, record_name: str, data: str, ttl: int = 600):
@@ -12,10 +13,18 @@ class DNSRecord():
         record_name: @, a string, etc
         data: value associated with the record
         """
-        self.record_type = record_type
-        self.record_name = record_name
-        self.data = data
-        self.ttl = ttl
+        self.record_type: str = record_type
+        self.record_name: str = record_name
+        self._data: str = data
+        self.ttl: int = ttl
+
+    @property
+    def data(self):
+        return get_derived_var(self._data)
+
+    @data.setter
+    def data(self, value: str):
+        self._data = value
 
     def __str__(self):
         return f"DNSRecord(record_type={self.record_type}, ttl={self.ttl}, data={self.data})"
@@ -33,7 +42,7 @@ class Default_Registrar():
                 ) -> None:
         self.Config: Config_Obj
         self.dotenv_varname = dotenv_varname
-        self.domains: dict[str, str] = {x['domain']: new_dict_exclude_key(x, 'domain') for x in domains} #type: ignore
+        self.domains: dict[str, dict[str, str]] = {x['domain']: new_dict_exclude_key(x, 'domain') for x in domains} #type: ignore
         self.start_end_marks = start_end_marks
 
     @abstractmethod
@@ -69,37 +78,15 @@ class Default_Registrar():
         else:
             raise IndexError(f"'{bundle_name}' not present in sites.yaml under key 'hostname_bundles'")
 
-    # def get_hostname_pair(self, domain: str) -> list[tuple[str, str, str]]:
-    def get_dns_records_for_domain(self, domain: str) -> list[tuple[str, str, str]]:
+    def get_dns_records_for_domain(self, domain: str) -> list[DNSRecord]:
         """returns a list of DNSRecord Objects based on the provided domain for this current object
         This involves looking up the bundle name in Config.hostname_bundles
         """
         domain_data = self.domains[domain]
         if 'hostname' in domain_data:
             raise NotImplementedError(f"'hostname' is not yet a valid key under 'domains' key. Use bundles instead, for {domain}")
+            #NOTE: This step will need to resolve variables like !public_ip
         if 'bundle' in domain_data:
             return self._get_DNSRecords_by_bundlename(domain_data['bundle'])
 
         raise ValueError(f"Neither 'hostname' nor 'bundle' key are present under 'domains' key for domain {domain}")
-
-
-
-def new_dict_exclude_key(entire_dict: dict[Any, Any], remove_key: Any) -> dict[Any, Any]:
-    """
-    Create a new dictionary by excluding a specified key and its associated value.
-
-    Parameters:
-    - original_dict (dict): The input dictionary.
-    - key_to_exclude (str): The key to be excluded from the dictionary.
-
-    Returns:
-    - dict: A new dictionary without the specified key and its associated value.
-
-    Example:
-    >>> input_dict = {'a': 1, 'b': 2, 'c': 3}
-    >>> new_dict = exclude_key(input_dict, 'b')
-    {'a': 1, 'c': 3}
-    """
-    copied_dict = entire_dict.copy()
-    del copied_dict[remove_key]
-    return copied_dict

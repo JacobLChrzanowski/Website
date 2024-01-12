@@ -86,10 +86,9 @@ class OPNSense(Default_Source):
 
     def obtain_state(self) -> None:
         for key in self.exports:
-            if get_derived_var(key) is not None:
+            if get_derived_var(key, checking = False) is not None:
                 continue
             self.get_function_from_exported_varname(key)(key)
-
 
     def get_public_ip(self, key: str) -> None:
         url = self.url.format(host=self.host)
