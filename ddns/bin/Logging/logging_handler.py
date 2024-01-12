@@ -40,7 +40,6 @@ def setup_logging(verbose: bool, debug: bool, project_path: str):
     if logger.level < logging.INFO:
         longest_py_path = find_longest_path_in_project(project_path)
         # longest_py_path = 10
-        print(longest_py_path)
         location = f"%(filename)-{longest_py_path}s %(funcName)16s:%(lineno)-3s "
         format_string = format_string.format(location=location)
     else:

@@ -49,5 +49,6 @@ class GoDaddy(Default_Registrar):
             if r.status_code == 200:
                 return True
         else:
+            headers['Authorization'] = headers['Authorization'].replace(api_key, 'xxx')
             log.debug(f"{url} {headers} {payload}")
 

@@ -20,9 +20,10 @@ def main(dryrun: bool, verbose: bool, debug: bool):
     conf.get_config(etc_folder=ETC_FOLDER,
                     yaml_path=SITES_PATH,
                     args=args)
-    # print(Config.hostname_bundles)
-    # print(Config.args)
-    Config.pushes[0].update()
+
+    #TODO: print config
+    for push in Config.pushes:
+        push.update()
 
     log.info('Done')
     
@@ -30,14 +31,3 @@ def main(dryrun: bool, verbose: bool, debug: bool):
 
 if __name__ == '__main__':
     main()
-    
-    # print(f"in main, printing Config var: {Config}")
-    # registrar: Default_Registrar = Config.pushes[0]
-    # registrar.update()
-
-    # exit()
-    # import code, readline
-    # variables = globals().copy()
-    # variables.update(locals())
-    # shell = code.InteractiveConsole(variables)
-    # shell.interact()
