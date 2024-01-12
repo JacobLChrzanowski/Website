@@ -3,8 +3,7 @@ import json
 import requests
 import logging as log
 from .Default import Default_Registrar, DNSRecord, new_dict_exclude_key
-from Config.config import Config, Config_Obj
-from Config.derived_var_helper import get_derived_var
+from Config.config import Config
 
 class GoDaddy(Default_Registrar):
     """
@@ -20,7 +19,6 @@ class GoDaddy(Default_Registrar):
                  start_end_marks:       tuple[str, str]
                 ) -> None:
         """Config at this point is empty"""
-        self.Config: Config_Obj = Config
         self.dotenv_varname = dotenv_varname
         self.domains: dict[str, dict[str, str]] = {x['domain']: new_dict_exclude_key(x, 'domain') for x in domains} #type: ignore
         self.start_end_marks = start_end_marks

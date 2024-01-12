@@ -3,7 +3,7 @@
 # if TYPE_CHECKING:
 from abc import abstractmethod
 from Utils.dict_tools import new_dict_exclude_key
-from Config.config import Config_Obj
+from Config.config import Config
 from Config.derived_var_helper import get_derived_var
 
 class DNSRecord():
@@ -40,7 +40,6 @@ class Default_Registrar():
                  start_end_marks:
                  tuple[str, str]
                 ) -> None:
-        self.Config: Config_Obj
         self.dotenv_varname = dotenv_varname
         self.domains: dict[str, dict[str, str]] = {x['domain']: new_dict_exclude_key(x, 'domain') for x in domains} #type: ignore
         self.start_end_marks = start_end_marks
@@ -73,8 +72,8 @@ class Default_Registrar():
         If you give it "!default" it will return the list under hostname_bundles > default
         """
         bundle_name = bundlename[1:]
-        if bundle_name in self.Config.hostname_bundles:
-            return self.Config.hostname_bundles[bundle_name]
+        if bundle_name in Config.hostname_bundles:
+            return Config.hostname_bundles[bundle_name]
         else:
             raise IndexError(f"'{bundle_name}' not present in sites.yaml under key 'hostname_bundles'")
 

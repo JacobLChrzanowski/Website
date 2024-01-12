@@ -19,7 +19,7 @@ def get_derived_var(key: str, checking: bool = False) -> Any:
         return None
     if key[0] == '!':
         key = key[1:]
-    if key not checking Config.derived_vars:
+    if key not in Config.derived_vars:
         if checking:
             log.warning(f"derived_state key '{key}' missing from Config. Returning None.")
         return None
