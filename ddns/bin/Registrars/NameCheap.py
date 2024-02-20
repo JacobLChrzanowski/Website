@@ -4,7 +4,6 @@ import requests
 import logging as log
 from .Default import Default_Registrar, DNSRecord, new_dict_exclude_key
 from Config.config import Config
-from Config.derived_var_helper import get_derived_var
 
 class NameCheap(Default_Registrar):
     """

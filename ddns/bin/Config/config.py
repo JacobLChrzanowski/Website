@@ -25,5 +25,5 @@ class Config_Obj():
         self.hostname_bundles: dict[str, list[DNSRecord]] = {}
         self.sources: list[Default_Source]
         self.derived_vars: dict[str, str]
-# Config = DotMap()
+
 Config = Config_Obj()
