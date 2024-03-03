@@ -1,5 +1,5 @@
 from flask import Flask, render_template, send_from_directory, abort,\
-redirect, url_for, request
+    redirect, url_for, request
 from app import app
 from src import redis
 from src import postgres

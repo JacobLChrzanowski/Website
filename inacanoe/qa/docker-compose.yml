@@ -3,7 +3,9 @@ services:
     build:
       context: .
       target: builder
+      dockerfile: Dockerfile.web
     container_name: inacanoe-qa-web
+    image: inacanoe-qa-web
     # flask requires SIGINT to stop gracefully
     # (default stop signal from Compose is SIGTERM)
     stop_signal: SIGINT
@@ -24,6 +26,10 @@ services:
       - '6379:6379'
     volumes:
       - ./redis_storage:/data
+    # https://stackoverflow.com/questions/31746182/
+    # https://stackoverflow.com/questions/67904609/
+    healthcheck:
+      test: "exit 0"
 
   postgres_db:
     image: "postgres"
@@ -33,5 +39,14 @@ services:
       - '8080:8080'
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
+    user: "1000"
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    # command: ["sh", "-c", "mkdir -p /var/lib/postgresql/data && chown -R 1000:1000 /var/lib/postgresql/data && exec postgres"]
+    # # https://stackoverflow.com/questions/65115627/
+    # healthcheck:
+    #   test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+    #   interval: 5s
+    #   timeout: 30s
+    #   retries: 5
+    #   start_period: 15s
