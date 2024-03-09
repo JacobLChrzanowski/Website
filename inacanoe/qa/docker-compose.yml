@@ -1,7 +1,7 @@
 services:
   web:
     build:
-      context: .
+      context: ./dockerfile
       target: builder
       dockerfile: Dockerfile.web
     container_name: inacanoe-qa-web
@@ -12,12 +12,14 @@ services:
     ports:
       - '5010:8080'
     volumes:
-      - .:/code
+      - ./web_src:/code
     env_file:
       - .env
     depends_on:
-      - redis
-      - postgres_db
+      redis:
+        condition: service_started
+      postgres_db:
+        condition: service_started
 
   redis:
     image: redislabs/redismod
@@ -25,11 +27,11 @@ services:
     ports:
       - '6379:6379'
     volumes:
-      - ./redis_storage:/data
+      - ./data/redis_storage:/data
     # https://stackoverflow.com/questions/31746182/
     # https://stackoverflow.com/questions/67904609/
-    healthcheck:
-      test: "exit 0"
+    # healthcheck:
+    #   test: "exit 0"
 
   postgres_db:
     image: "postgres"
@@ -38,15 +40,11 @@ services:
       - '5432:5432'
       - '8080:8080'
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
-    user: "1000"
+      - ./data/postgres-data:/var/lib/postgresql/data
+      - ./scripts/postgres:/docker-entrypoint-initdb.d
+    user: ${POSTGRES_CONTAINER_USERID}
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    # command: ["sh", "-c", "mkdir -p /var/lib/postgresql/data && chown -R 1000:1000 /var/lib/postgresql/data && exec postgres"]
-    # # https://stackoverflow.com/questions/65115627/
-    # healthcheck:
-    #   test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
-    #   interval: 5s
-    #   timeout: 30s
-    #   retries: 5
-    #   start_period: 15s
+      POSTGRES_PASSWORD: ${POSTGRES_DB_PASSWORD}
+    # health_check does not work here because pg_isready has
+    # no clue what to do when container is executing as user
+    # other than root

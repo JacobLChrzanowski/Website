@@ -162,7 +162,8 @@ cython_debug/
 ##### Generic Files
 # Stops tracking supervisord.pid
 *.pid
-# Don't attempt to copy Redis storage
-**/redis_storage/
+# Don't attempt to save storage
+**postgres-data/
+**redis_storage/
 # test folder
 test/*

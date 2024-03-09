@@ -1,8 +1,8 @@
 from flask import Flask, render_template, send_from_directory, abort,\
     redirect, url_for, request
 from app import app
-from src import redis
-from src import postgres
+from app import redis
+from app import postgres
 import os, logging
 import psycopg2
 # import blogPosts as bp
