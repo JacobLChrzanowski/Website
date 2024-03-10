@@ -8,7 +8,19 @@ LOGGING_LEVEL = _LOGGING_LEVELS[os.environ['LOGGING_LEVEL']]
 logging.basicConfig(level=LOGGING_LEVEL, format='%(asctime)s %(levelname)s %(filename)s:%(lineno)s :: %(message)s')
 app = Flask(__name__, static_folder='../static')
 
-redis = connections.conn_redis()
-postgres = connections.conn_postgres()
+redis = connections.RedisWrapper(
+    host='inacanoe-qa-redis',
+    port=6379
+)
+postgres = connections.PostgresWrapper(
+    app,
+    host='inacanoe-qa-postgres',
+    port=5432,
+    user=os.environ['POSTGRES_DB_USER'],
+    password=os.environ['POSTGRES_DB_PASSWORD'],
+    db_name='postgres'
+)
 
-from app import routes
+from app import routes # type: ignore
+from app.routes_db import routes_db #type: ignore
+app.register_blueprint(routes_db)

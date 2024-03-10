@@ -1,7 +1,7 @@
 services:
   web:
     build:
-      context: ./dockerfile
+      context: .
       target: builder
       dockerfile: Dockerfile.web
     container_name: inacanoe-qa-web
