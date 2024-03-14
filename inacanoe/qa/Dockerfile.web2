@@ -1,0 +1,40 @@
+# syntax=docker/dockerfile:1.4
+FROM --platform=$BUILDPLATFORM python:3.11-alpine AS builder
+
+RUN apk update
+RUN apk add --no-cache \
+        openblas-dev gfortran supervisor
+# Alpine linux makes available openblas-dev instead of libatlas-base-dev
+#  This is an alternative BLAS/LAPACK implementation
+
+# RUN pip3 install uwsgi
+RUN apk add uwsgi-python3
+# uWSGI Python plugin
+# As an env var to re-use the config file
+# ENV UWSGI_PLUGIN python3
+#
+COPY web_src/requirements.txt /project/
+
+# RUN pip3 install -r /project/requirements.txt
+#.. /usr/local/bin/python and /usr/bin/python are not the same
+#.. /usr/bin/python has no pip so you must mount pip from your local machine
+#.. uwsgi's `module = python` directive then calls on /usr/bin/python3, not /usr/local/bin/python3
+RUN mkdir -p /usr/lib/python3.11/site-packages
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip3 install \
+        --requirement /project/requirements.txt \
+        --target=/usr/lib/python3.11/site-packages
+# uwsgi runs as nginx user
+RUN adduser --no-create-home nginx -D
+# RUN useradd --no-create-home nginx
+# RUN rm /etc/nginx/sites-enabled/default
+# RUN rm -r /root/.cache
+
+COPY scripts/supervisord.conf /etc/supervisor/
+# COPY web_src /project/src
+
+WORKDIR /project
+
+# CMD ["/usr/bin/supervisord"]
+CMD /usr/sbin/uwsgi --ini /etc/uwsgi/uwsgi.ini --die-on-term
+# CMD sleep 1000

@@ -1,21 +1,23 @@
 # syntax=docker/dockerfile:1.4
-FROM --platform=$BUILDPLATFORM python:3.10-alpine AS builder
+FROM --platform=$BUILDPLATFORM python:3.11-alpine AS builder
 
-WORKDIR /web_src
+WORKDIR /project
 
-COPY web_src/requirements.txt /code
+COPY web_src/requirements.txt /project
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip3 install -r requirements.txt
 
 #COPY . /code
 
-ENTRYPOINT ["python3"]
-CMD ["app.py"]
+ENTRYPOINT ["/usr/local/bin/python3", "-m", "flask"]
+# https://flask.palletsprojects.com/en/3.0.x/cli/
+
+# CMD /bin/sleep 1000
+
 # ENV FLASK_APP=app/__init__.py
 # CMD ["flask", "run", "--host", "0.0.0.0", "-p", "80"]
 
 FROM builder as dev-envs
-
 RUN <<EOF
 apk update
 apk add git bash

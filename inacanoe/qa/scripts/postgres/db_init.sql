@@ -38,7 +38,7 @@ CREATE TABLE public.user (
 ALTER TABLE public.blog_post
 	ADD CONSTRAINT blog_post_author_fk FOREIGN KEY (author_id) REFERENCES public.user (id);
 
--- auto-update date_dreated column of blog_post and user tables, on row modification
+-- auto-update date_created column of blog_post and user tables, on row modification
 -- https://x-team.com/blog/automatic-timestamps-with-postgresql/
 CREATE OR REPLACE FUNCTION trigger_set_timestamp()
 RETURNS TRIGGER AS $$

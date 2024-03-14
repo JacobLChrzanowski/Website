@@ -1,10 +1,9 @@
-from flask import Flask, Blueprint, render_template
-from app import app
-from app import postgres
+from flask import Flask, Blueprint, current_app, render_template
+# from app import postgres
 import logging
 import psycopg2.errors
 
-routes_db = Blueprint('exta_bp', __name__)
+routes_db = Blueprint('routes_db', __name__)
 
 # to check DB connection:
 @routes_db.route("/testDB", methods=['GET', 'POST'])
@@ -31,15 +30,21 @@ def test_db():
 @routes_db.route("/get_user", methods=['GET'])
 def get_user():
     try:
-        cur = postgres.p.cursor()
+        cur = current_app.postgres.p.cursor()
+        cur.close()
     except Exception as e:
         raise e
+    return 'get_user'
 
 @routes_db.route("/users")
 def user_list():
-    users = postgres.db.session.execute(postgres.db.select(postgres.User).order_by(postgres.User.username)).scalars()
+    users = current_app.postgres.db.session.execute(current_app.postgres.db.select(current_app.postgres.User).order_by(current_app.postgres.User.username)).scalars()
     # return render_template("user/list.html", users=users)
-    return str(users)
+    user_strings: list[str] = []
+    for user in users:
+        user_strings.append(f"{user.username}, {user.date_created}, {type(user.date_created)}, {user.description}")
+    out = "<br>".join(user_strings)
+    return f".{out}."
 
     # try:
     #     if request.method == 'GET':
