@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile.web3
     container_name: inacanoe-qa-web
     image: inacanoe-qa-web
-    command: ["--app", "web_src.app:create_app()", "run", "--port", "5010", "--debug"]
+    command: ["--app", "web_src.app:create_app()", "run", "--host=0.0.0.0", "--port", "5010", "--debug"]
     # network_mode: "host"
     # flask requires SIGINT to stop gracefully
     # (default stop signal from Compose is SIGTERM)
