@@ -15,7 +15,7 @@ services:
     volumes:
       - ./web_src:/project/web_src:ro
       - ./scripts/uwsgi.ini:/etc/uwsgi/uwsgi.ini:ro
-      # - ./scripts/shared_entrypoint.sh:/project/shared_entrypoint.sh:ro
+      - ./scripts/shared_entrypoint.sh:/project/shared_entrypoint.sh:ro
     env_file:
       - .env
     depends_on:
