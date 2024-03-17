@@ -1,5 +1,8 @@
 # syntax=docker/dockerfile:1.4
+# prod
 FROM --platform=$BUILDPLATFORM python:3.11-alpine AS builder
+
+WORKDIR /project
 
 RUN apk update
 RUN apk add --no-cache \
@@ -30,10 +33,8 @@ RUN adduser --no-create-home nginx -D
 # RUN rm /etc/nginx/sites-enabled/default
 # RUN rm -r /root/.cache
 
-COPY scripts/supervisord.conf /etc/supervisor/
+# COPY scripts/supervisord.conf /etc/supervisor/
 # COPY web_src /project/src
-
-WORKDIR /project
 
 # CMD ["/usr/bin/supervisord"]
 CMD /usr/sbin/uwsgi --ini /etc/uwsgi/uwsgi.ini --die-on-term

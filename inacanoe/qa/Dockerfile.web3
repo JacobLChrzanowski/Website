@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1.4
+# qa
 FROM --platform=$BUILDPLATFORM python:3.11-alpine AS builder
 
 WORKDIR /project
@@ -9,23 +10,23 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 #COPY . /code
 
-ENTRYPOINT ["/usr/local/bin/python3", "-m", "flask"]
+CMD ["/usr/local/bin/python3"]
+# ENTRYPOINT ["/usr/local/bin/python3", "-m", "flask", \
+#             "--app", "web_src.app:create_app()", "run", \
+#             "--host=0.0.0.0", "--port", "5010", \
+#             "--debug" \
+# ]
 # https://flask.palletsprojects.com/en/3.0.x/cli/
 
-# CMD /bin/sleep 1000
+# FROM builder as dev-envs
+# RUN <<EOF
+# apk update
+# apk add git bash
+# EOF
 
-# ENV FLASK_APP=app/__init__.py
-# CMD ["flask", "run", "--host", "0.0.0.0", "-p", "80"]
-
-FROM builder as dev-envs
-RUN <<EOF
-apk update
-apk add git bash
-EOF
-
-RUN <<EOF
-addgroup -S docker
-adduser -S --shell /bin/bash --ingroup docker vscode
-EOF
-# install Docker tools (cli, buildx, compose)
-COPY --from=gloursdocker/docker / /
+# RUN <<EOF
+# addgroup -S docker
+# adduser -S --shell /bin/bash --ingroup docker vscode
+# EOF
+# # install Docker tools (cli, buildx, compose)
+# COPY --from=gloursdocker/docker / /

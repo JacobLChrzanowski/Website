@@ -3,21 +3,19 @@ services:
     build:
       context: .
       target: builder
-      dockerfile: Dockerfile.web3
-    container_name: inacanoe-qa-web
+      dockerfile: Dockerfile.web4
+    container_name: inacanoe-web
     image: inacanoe-qa-web
-    command: ["--app", "web_src.app:create_app()", "run", "--host=0.0.0.0", "--port", "5010", "--debug"]
-    # network_mode: "host"
+    command: ["prod"]
     # flask requires SIGINT to stop gracefully
     # (default stop signal from Compose is SIGTERM)
     stop_signal: SIGINT
     ports:
       - 5010:5010
-      # - '5010:8080'
     volumes:
-      # - ./web_src:/code:ro
       - ./web_src:/project/web_src:ro
       - ./scripts/uwsgi.ini:/etc/uwsgi/uwsgi.ini:ro
+      # - ./scripts/shared_entrypoint.sh:/project/shared_entrypoint.sh:ro
     env_file:
       - .env
     depends_on:

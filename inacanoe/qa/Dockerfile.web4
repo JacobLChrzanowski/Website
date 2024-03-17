@@ -1,0 +1,22 @@
+# syntax=docker/dockerfile:1.4
+# qa
+FROM --platform=$BUILDPLATFORM python:3.11-alpine AS builder
+
+WORKDIR /project
+
+COPY web_src/requirements.txt /project
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip3 install -r requirements.txt \
+    --target=/usr/lib/python3.11/site-packages
+
+RUN apk update
+RUN apk add --no-cache \
+        openblas-dev \
+        gfortran \
+        uwsgi-python3
+# Alpine linux makes available openblas-dev instead of libatlas-base-dev
+#  This is an alternative BLAS/LAPACK implementation
+
+WORKDIR /project
+COPY scripts/shared_entrypoint.sh /project/
+ENTRYPOINT ["/project/shared_entrypoint.sh"]
